@@ -22,6 +22,13 @@ using namespace std;
 //          for che inserisce nodi di valore casuale nell'albero
 // 6) opzionale: evitare il calcolo di tutte le altezze
 
+////CERINELLI MATTEO
+string tree1 ="";
+string tree2 ="";
+int hTree1, hTree2, nodes1, nodes2;
+
+
+
 int ct_swap = 0;
 int ct_cmp = 0;
 int ct_op = 0; /// operazioni per la ricerca
@@ -77,7 +84,7 @@ void print_node_code(node_t *n) {
 }
 
 void node_print_graph(node_t *n) {
-
+    cout<<n;
     print_node_code(n);
     output_graph << "\n[label=<\n<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\" >\n<TR> <TD CELLPADDING=\"3\" BORDER=\"0\"  ALIGN=\"LEFT\" bgcolor=\"#f0f0f0\" PORT=\"id\">";
     output_graph << get_address(n) << "</TD> </TR><TR>\n<TD PORT=\"val\" bgcolor=\"#a0FFa0\">";
@@ -180,14 +187,18 @@ int n_nodes = 0;
 void insert_random_rec(node_t *n) {
     //// inserisce in modo random un nodo L e R e prosegue ricorsivamente
     /// limito i nodi interni totali, in modo da evitare alberi troppo grandi
-
+    static bool first_call = true;
+    if (first_call) {
+        srand(time(0));
+        first_call = false;
+    }
     printf("inserisco %d\n", n_nodes);
 
     if (n_nodes++ >= max_nodes) /// limito il numero di nodi
         return;
     printf("inserisco %d\n", n_nodes);
 
-    float probabilita = 0.5; /// tra 0 e 1
+    float probabilita = 0.8; /// tra 0 e 1
 
     if (rand() % 100 < probabilita * 100) { // se numero random e' minore della probabilita' -> aggiungo nodo con valore a caso
         tree_insert_child_R(n, rand() % 100);
@@ -347,10 +358,13 @@ void postOrder(node_t *n) {
     }
 }
 
-void EulerOrder(node_t *n) {
+string EulerOrder(node_t *n, string &tree) {
 
-    if (details)
+    if (1){
         printf("%d ", n->val);
+        tree += to_string(n->val);
+    }
+
 
     output_visit << n->val << "\n";
 
@@ -367,7 +381,7 @@ void EulerOrder(node_t *n) {
             output_graph << ":id:w [ color=blue, fontcolor=blue, penwidth=3, label = \"" << ct_visit++ << "\"]\n";
         }
 
-        EulerOrder(n->L);
+        EulerOrder(n->L, tree);
 
         if (graph) {
             // scrivo arco con numero operazione di visita
@@ -378,8 +392,10 @@ void EulerOrder(node_t *n) {
         }
     }
 
-    if (details)
+    if (1){
         printf("%d ", n->val);
+        tree += to_string(n->val);
+    }
     output_visit << n->val << "\n";
 
     if (n->R != NULL) {
@@ -390,7 +406,7 @@ void EulerOrder(node_t *n) {
             print_node_code(n->R);
             output_graph << ":id:w [ color=blue, fontcolor=blue, penwidth=3, label = \"" << ct_visit++ << "\"]\n";
         }
-        EulerOrder(n->R);
+        EulerOrder(n->R, tree);
         if (graph) {
             // scrivo arco con numero operazione di visita
             print_node_code(n->R);
@@ -400,9 +416,13 @@ void EulerOrder(node_t *n) {
         }
     }
 
-    if (details)
+    if (1){
         printf("%d ", n->val);
+        tree += to_string(n->val);
+    }
     output_visit << n->val << "\n";
+
+    return tree;
 }
 
 /// crea una copia dell'albero in input, scambiando i sottoalberi L e R
@@ -657,6 +677,77 @@ int parse_cmd(int argc, char **argv) {
     return 0;
 }
 
+bool checkIfTree2IsInTree1(string tree1Euler, string tree2Euler)
+{
+    return tree1Euler.find(tree2Euler);
+}
+
+bool albero2minore( int altezza1, int altezza2)
+{
+    return altezza2 < altezza1;
+}
+
+bool albero2menoNodi(int nodi1, int nodi2)
+{
+    return nodi2 < nodi1;
+}
+
+
+bool trovato = false;
+int nodiVisitati = 0;
+void check(node_t *node1, node_t *node2, node_t *root1)
+{
+    if(albero2minore(hTree1,hTree2)) //il secondo albero è minore del primo
+    {
+        return;
+    }
+    if(albero2menoNodi(nodes1,nodes2))
+    {
+        return;
+    }
+
+    if(node1 == node2) //attenzione, radici uguali
+    {
+        nodiVisitati++;
+        if(nodiVisitati<nodes1)
+        {
+            if(node1->L != NULL && node2->L != NULL)
+            {
+                check(node1->L,node2->L,root1);
+            }
+            if(node1->R != NULL && node2->R != NULL)
+            {
+                check(node1->R,node2->R,root1);
+            }
+        }
+        else{
+           trovato == true;
+        }
+    }
+    else 
+    {
+        nodiVisitati =0;
+        if(node2->L != NULL)
+        {   
+            check(root1, node2->L,root1);
+        }
+        if(node2->R != NULL)
+        {
+            check(root1, node2->R,root1);
+        }
+    }
+}
+
+void contaProfondita(node_t *root, int &num)
+{
+    if(root ->L != NULL)
+    {
+        num++;
+         
+    }
+}
+
+
 int main(int argc, char **argv) {
     int i, test;
 
@@ -677,17 +768,39 @@ int main(int argc, char **argv) {
         output_graph << "edge[tailclip=false,arrowtail=dot];" << endl;
     }
 
-    node_t *root = NULL;
+    node_t *root = node_new(1);
+    node_t *rootTree2 = node_new(1);
+    insert_random_rec(root);
+    nodes1 = n_nodes;
+    n_nodes = 0;
+    insert_random_rec(rootTree2);
+    nodes2 = n_nodes;
+    cout << endl;
+    tree1 = EulerOrder(root,tree1);
+    cout<<endl<<"Albero1 Eulero: "<<tree1<<endl;
+    tree2 = EulerOrder(rootTree2,tree2);
+    cout << endl;
 
-    bst_insert(40, root);
-    global_ptr_ref = root; /// per manipolare i riferimenti relativi in memoria
+   cout<<"Albero2 Eulero: "<<tree2<<endl;
 
-    bst_insert(50, root);
-    bst_insert(60, root);
-    bst_insert(70, root);
+    if(checkIfTree2IsInTree1("ABCDDDCBA","ABCDDDCBA"))
+    {
+        cout<<"L'albero2 è dentro L'albero 1"<<endl;
+    }
+    else
+    {
+        cout<<"L'albero2 NON è dentro L'albero 1"<<endl;
+    }
 
-    tree_print_graph(root);
-    n_operazione++;
+    // bst_insert(40, root);
+    // global_ptr_ref = root; /// per manipolare i riferimenti relativi in memoria
+
+    // bst_insert(50, root);
+    // bst_insert(60, root);
+    // bst_insert(70, root);
+
+    // tree_print_graph(root);
+    // n_operazione++;
 
     // singleRotateLeft(root);
 
@@ -696,8 +809,10 @@ int main(int argc, char **argv) {
 
     // node_t* result=search(8,root);
 
-    int a=altezza(root);
-    printf("L'albero ha altezza %d\n",a);
+    int hTree1=altezza(root);
+    printf("L'albero1 ha altezza %d\n",hTree1);
+    int hTree2=altezza(rootTree2);
+    printf("L'albero2 ha altezza %d\n",hTree2);
 
     printf("L'albero e' bilanciato? %d\n", is_bilanciato(root));
 
