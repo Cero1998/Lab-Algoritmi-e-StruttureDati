@@ -465,7 +465,7 @@ int parse_cmd(int argc, char **argv) {
     return 0;
 }
 
-//CODICE CERINELLI
+///INIZIO CODICE CERINELLI
 bool tree2HasLessNodesThanTree1(int nodi1, int nodi2)
 {
     return nodi2 < nodi1;
@@ -513,6 +513,30 @@ void check(node_t *node1, node_t *node2, node_t *root1)
         nodesSeen =0;
     }
 }
+
+int isBalanced(node_t *node)
+{
+    if(node == NULL){
+        return 0;
+    }
+
+    int left = isBalanced(node->L);
+    int right = isBalanced(node->R);
+
+    int bf = left - right;
+
+    if(bf < -1 || bf > 1)
+    {
+        return -9999;
+    }
+
+    return max(left,right)+1;
+}
+
+
+///FINE CODICE CERINELLI
+
+
 
 int main(int argc, char **argv) {
     int i, test;
@@ -566,6 +590,16 @@ int main(int argc, char **argv) {
         cout<<"Tree1 not found inside Tree2"<<endl;
     }
 
+
+    int bilanciato1 = isBalanced(rootTree1);
+    int bilanciato2 = isBalanced(rootTree2);
+
+    if(bilanciato1 == -9999){
+        cout<<"albero1 sbilanciato"<<endl;
+    }
+    if(bilanciato2 == -9999){
+        cout<<"albero2 sbilanciato"<<endl;
+    }
 
     // node_t *root = node_new(1);
     // global_ptr_ref = root;
