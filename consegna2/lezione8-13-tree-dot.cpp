@@ -514,6 +514,7 @@ void check(node_t *node1, node_t *node2, node_t *root1)
     }
 }
 
+bool isTreeBalanced = true;
 int isBalanced(node_t *node)
 {
     if(node == NULL){
@@ -527,13 +528,12 @@ int isBalanced(node_t *node)
 
     if(bf < -1 || bf > 1)
     {
-        return -9999;
+        isTreeBalanced = false;
+        return -99999;
     }
 
     return max(left,right)+1;
 }
-
-
 ///FINE CODICE CERINELLI
 
 
@@ -569,18 +569,24 @@ int main(int argc, char **argv) {
 
     tree_insert_child_L(rootTree1, 2);
     tree_insert_child_R(rootTree1, 5);
+    tree_insert_child_R(rootTree1->R, 8);
+    tree_insert_child_R(rootTree1->R->R, 86);
 
     tree_insert_child_L(rootTree2, 1);
     tree_insert_child_R(rootTree2, 6);
+    tree_insert_child_R(rootTree2->R, 1);
+    tree_insert_child_R(rootTree2->R->R, 5);
+    tree_insert_child_L(rootTree2->R->R, 2);
     tree_insert_child_L(rootTree2->L, 4);
     tree_insert_child_R(rootTree2->L, 5);
     tree_insert_child_L(rootTree2->L->L, 1);
     tree_insert_child_L(rootTree2->L->L->L, 2);
-    tree_insert_child_R(rootTree2->L->L->L, 5);
+    tree_insert_child_R(rootTree2->L->L->L, 6);
+    tree_insert_child_L(rootTree2->L->L->L->L, 10);
 
 
     nodesTree1 = 3;
-    nodesTree2 = 8;
+    nodesTree2 = 9;
     found=false;
     check(rootTree1,rootTree2,rootTree1);
     if(found){
@@ -591,14 +597,22 @@ int main(int argc, char **argv) {
     }
 
 
-    int bilanciato1 = isBalanced(rootTree1);
-    int bilanciato2 = isBalanced(rootTree2);
-
-    if(bilanciato1 == -9999){
-        cout<<"albero1 sbilanciato"<<endl;
+    isBalanced(rootTree1);
+    if(isTreeBalanced){
+        cout<<"albero1 bilanciato"<<endl;
     }
-    if(bilanciato2 == -9999){
-        cout<<"albero2 sbilanciato"<<endl;
+    else
+    {
+        cout<<"albero1 sbilanciato"<<endl; 
+    }
+    isTreeBalanced = false;
+    isBalanced(rootTree2);
+    if(isTreeBalanced){
+        cout<<"albero2 bilanciato"<<endl;
+    }
+    else
+    {
+        cout<<"albero2 sbilanciato"<<endl; 
     }
 
     // node_t *root = node_new(1);
