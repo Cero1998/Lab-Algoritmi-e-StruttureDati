@@ -8,6 +8,12 @@
 
 using namespace std;
 
+///INIZIO CODICE CERINELLI
+int nodesTree1, nodesTree2, hTree1, hTree2;
+///FINE CODICE CERINELLI
+
+
+
 // compilazione: g++ lezione8-13-tree-dot.c
 //
 
@@ -187,7 +193,12 @@ int n_nodes = 0;
 void insert_random_rec(node_t *n) {
     //// inserisce in modo random un nodo L e R e prosegue ricorsivamente
     /// limito i nodi interni totali, in modo da evitare alberi troppo grandi
-
+    static bool first_call = true;
+    if (first_call) {
+        srand(time(0));
+        first_call = false;
+    }
+    
     printf("inserisco %d\n", n_nodes);
 
     if (n_nodes++ >= max_nodes) /// limito il numero di nodi
@@ -454,6 +465,55 @@ int parse_cmd(int argc, char **argv) {
     return 0;
 }
 
+//CODICE CERINELLI
+bool tree2HasLessNodesThanTree1(int nodi1, int nodi2)
+{
+    return nodi2 < nodi1;
+}
+
+bool found = false;
+int nodesSeen = 0;
+void check(node_t *node1, node_t *node2, node_t *root1)
+{
+
+    if(tree2HasLessNodesThanTree1(nodesTree1,nodesTree2))
+    {
+        return;
+    }
+
+    if(node1->val == node2->val) //attenzione, radici uguali
+    {
+        nodesSeen++;
+        if(nodesSeen<nodesTree1)
+        {
+            if(node1->L != NULL && node2->L != NULL)
+            {
+                check(node1->L,node2->L,root1);
+            }
+            if(node1->R != NULL && node2->R != NULL)
+            {
+                check(node1->R,node2->R,root1);
+            }
+        }
+        else{
+           found = true;
+        }
+    }
+    else 
+    {
+        if(node2->L != NULL)
+        {    nodesSeen =0;
+            check(root1, node2->L,root1);
+        }
+        if(node2->R != NULL)
+        {
+            nodesSeen =0;
+            check(root1, node2->R,root1);
+        }
+        nodesSeen =0;
+    }
+}
+
 int main(int argc, char **argv) {
     int i, test;
 
@@ -474,21 +534,59 @@ int main(int argc, char **argv) {
         output_graph << "edge[tailclip=false,arrowtail=dot];" << endl;
     }
 
-    node_t *root = node_new(1);
-    global_ptr_ref = root;
 
-    tree_print_graph(root);
-    tree_insert_child_L(root, 2);
-    tree_print_graph(root);
-    tree_insert_child_L(root->L, 3);
-    tree_print_graph(root);
-    tree_insert_child_L(root->L->L, 4);
-    tree_print_graph(root);
-    tree_insert_child_L(root->L->L->L, 5);
-    tree_print_graph(root);
+    node_t *rootTree1 = node_new(1);
+    node_t *rootTree2 = node_new(4);
+    //insert_random_rec(rootTree1);
+    //nodesTree1 = n_nodes;
+    n_nodes = 0;
+    //insert_random_rec(rootTree2);
+    //nodesTree2 = n_nodes;
 
-    // creo albero random
-    insert_random_rec(root);
+    tree_insert_child_L(rootTree1, 2);
+    tree_insert_child_R(rootTree1, 5);
+
+    tree_insert_child_L(rootTree2, 1);
+    tree_insert_child_R(rootTree2, 6);
+    tree_insert_child_L(rootTree2->L, 4);
+    tree_insert_child_R(rootTree2->L, 5);
+    tree_insert_child_L(rootTree2->L->L, 1);
+    tree_insert_child_L(rootTree2->L->L->L, 2);
+    tree_insert_child_R(rootTree2->L->L->L, 5);
+
+
+    nodesTree1 = 3;
+    nodesTree2 = 8;
+    found=false;
+    check(rootTree1,rootTree2,rootTree1);
+    if(found){
+        cout<<"Tree1 found in Tree2"<<endl;
+    }
+    else{
+        cout<<"Tree1 not found inside Tree2"<<endl;
+    }
+
+
+    // node_t *root = node_new(1);
+    // global_ptr_ref = root;
+
+    // tree_print_graph(root);
+    // tree_insert_child_L(root, 2);
+    // tree_print_graph(root);
+    // tree_insert_child_L(root->L, 3);
+    // tree_print_graph(root);
+    // tree_insert_child_L(root->L->L, 4);
+    // tree_print_graph(root);
+    // tree_insert_child_L(root->L->L->L, 5);
+    // tree_print_graph(root);
+
+
+
+
+
+
+    // // creo albero random
+    // insert_random_rec(root);
 
     // ct_visit = 0;
     // inOrder(root);
@@ -514,9 +612,9 @@ int main(int argc, char **argv) {
     // printf("\n");
 
     // stampa albero
-    if (graph)
-        tree_print_graph(root);
-    n_operazione++;
+    // if (graph)
+    //     tree_print_graph(root);
+    // n_operazione++;
 
     /* scheletro per la costruzione dell'albero a partire dalla visita di eulero
     input_visit.open("visit.txt");
@@ -531,13 +629,13 @@ int main(int argc, char **argv) {
       tree_print_graph(root);
     */
 
-    if (graph) {
-        /// preparo footer e chiudo file
-        output_graph << "}" << endl;
-        output_graph.close();
-        cout << " File graph.dot scritto" << endl
-             << "Creare il grafo con: dot graph.dot -Tpdf -o graph.pdf" << endl;
-    }
+    // if (graph) {
+    //     /// preparo footer e chiudo file
+    //     output_graph << "}" << endl;
+    //     output_graph.close();
+    //     cout << " File graph.dot scritto" << endl
+    //          << "Creare il grafo con: dot graph.dot -Tpdf -o graph.pdf" << endl;
+    // }
 
     return 0;
 }
