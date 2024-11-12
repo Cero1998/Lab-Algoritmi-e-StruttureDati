@@ -243,8 +243,8 @@ void print_array_graph(int *A, int n, string c, int a, int l, int m, int r) {
 }
 ///INIZIO CODICE CERINELLI
 int parent_idx(int n) {
-    if (n == 0)
-        return -1;
+    // if (n == 0)
+    //     return -1;
     return (n - 1) / 2;
 }
 
@@ -287,7 +287,7 @@ void heap_insert(int elem) {
         heap[i] = elem;
 
         while (i != 0) {                          // non sono sulla radice
-            if (heap[parent_idx(i)] >= heap[i]) { /// proprieta' dell' heap e' rispettata -> esco
+            if (heap[parent_idx(i)] <= heap[i]) { /// proprieta' dell' heap e' rispettata -> esco
                 if (details)
                     printf("Il genitore ha valore %d >= del nodo %d, esco\n", heap[parent_idx(i)], heap[i]);
                 return;
@@ -295,7 +295,7 @@ void heap_insert(int elem) {
 
             if (details)
                 printf("Il genitore ha valore %d < del nodo %d, swap\n", heap[parent_idx(i)], heap[i]);
-            /// il nodo ha un genitore sicuramente <   --> swap
+            /// il nodo ha un genitore sicuramente >   --> swap
             int t = heap[parent_idx(i)];
             heap[parent_idx(i)] = heap[i];
             heap[i] = t;
@@ -347,29 +347,29 @@ void decrease_key(int indice_nodo, int key) {
     }
 }
 
-int heap_remove_max() {
+int heap_remove_min() {
 
     if (heap_size <= 0) { /// heap vuoto!
         printf("Errore: heap vuoto\n");
         return -1;
     }
 
-    int massimo = heap[0];
+    int minimo = heap[0];
 
     if (details)
-        printf("Massimo identificato %d\n", massimo);
+        printf("Minimo identificato %d\n", minimo);
     /// scambio la radice con l'ultima foglia a destra
-    /// il massimo e' stato spostato in fondo --> pronto per l'eliminazione
-    int t = heap[0];
+    /// il minimo e' stato spostato in fondo --> pronto per l'eliminazione
+    int radice = heap[0];
     heap[0] = heap[heap_size - 1];
-    heap[heap_size - 1] = t;
+    heap[heap_size - 1] = radice;
 
-    // elimino il massimo (ora in fondo all'array)
+    // elimino il minimo (ora in fondo all'array)
     heap_size--;
 
     //    tree_print_graph(0);  // radice
 
-    /// nella radice c'e' un valore piccolo (minimo?)
+    /// nella radice c'e' un valore Grande (massimo?)
     int i = 0; // indice di lavoro (parto dalla root)
 
     while (!is_leaf(i)) { /// garantisco di fermarmi alla foglia
@@ -380,25 +380,25 @@ int heap_remove_max() {
         int con_chi_mi_scambio = -1;
 
         /// controllo il nodo i con il suo figlio L
-        if (heap[i] < heap[child_L_idx(i)]) { // il nodo i e' piu' piccolo
+        if (heap[i] > heap[child_L_idx(i)]) { // il nodo i e' piu' grande
             /// attivare uno swap (la proprieta' heap non e' rispettata)
             con_chi_mi_scambio = child_L_idx(i);
             if (details)
-                printf("Figlio L e' piu' grande (valore %d)\n", heap[child_L_idx(i)]);
+                printf("Figlio L e' piu' piccolo (valore %d)\n", heap[child_L_idx(i)]);
 
             if (child_R_idx(i) >= 0 && // esiste il nodo destro
-                heap[child_L_idx(i)] < heap[child_R_idx(i)]) {
+                heap[child_L_idx(i)] > heap[child_R_idx(i)]) {
                 con_chi_mi_scambio = child_R_idx(i);
                 if (details)
-                    printf("Figlio R e' ancora piu' grande (valore %d)\n", heap[child_R_idx(i)]);
+                    printf("Figlio R e' ancora piu' piccolo (valore %d)\n", heap[child_R_idx(i)]);
             }
-        } else { // il nodo e' piu' grande del figlio L
+        } else { // il nodo e' piu' piccolo del figlio L
 
             if (child_R_idx(i) >= 0) {                // esiste il figlio R
-                if (heap[i] < heap[child_R_idx(i)]) { /// attivo lo swap
+                if (heap[i] > heap[child_R_idx(i)]) { /// attivo lo swap
                     con_chi_mi_scambio = child_R_idx(i);
                     if (details)
-                        printf("Figlio R e' piu' grande del nodo (valore %d)\n", heap[child_R_idx(i)]);
+                        printf("Figlio R e' piu' piccolo del nodo (valore %d)\n", heap[child_R_idx(i)]);
                 } else
                     break;
             } else
@@ -416,9 +416,40 @@ int heap_remove_max() {
         // n_operazione++;
     }
 
-    return massimo;
+    return minimo;
 }
+    void minHeapify(int i) 
+    {
+        // Initialize smallest as root
+        int minimo = i;    
+        
+        // If left child is smaller than root
+        if (child_L_idx(i) >=0 //figlio sx esiste
+                && heap[child_L_idx(i)] < heap[minimo])
+            minimo = child_L_idx(i);
 
+        // If right child is smaller than the smallest so far
+        if (child_R_idx(i) >=0 //figlio dx esiste
+                && heap[child_R_idx(i)] < heap[minimo])
+            minimo = child_R_idx(i);
+
+        // If smallest is not root
+        if (minimo != i) {
+
+            int t = heap[i];
+            heap[i] = heap[minimo];
+            heap[minimo] = t;
+
+            minHeapify(minimo);                
+        }
+    }
+    void buildMinHeap()
+    {
+        int n = heap_size;
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            minHeapify(i);
+        }
+    } 
 void shortest_path(int n) {
 
     /*      V_visitato[i]=0;  // flag = non visitato
