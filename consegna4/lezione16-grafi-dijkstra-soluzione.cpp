@@ -336,9 +336,9 @@ void decrease_key(int indice_nodo, int key) {
         if (details)
             printf("Il genitore ha valore %d > del nodo %d, swap\n", heap[parent_idx(i)], heap[i]);
         /// il nodo ha un genitore sicuramente <   --> swap
-        int t = heap[parent_idx(i)];
+        int parentNode = heap[parent_idx(i)];
         heap[parent_idx(i)] = heap[i];
-        heap[i] = t;
+        heap[i] = parentNode;
 
         //tree_print_graph(0); // radice
         n_operazione++;
