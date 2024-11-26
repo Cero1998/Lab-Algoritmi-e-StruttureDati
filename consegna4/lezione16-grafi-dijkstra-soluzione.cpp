@@ -66,6 +66,7 @@ float *V_dist;   // distanza da sorgente
 const int MAX_SIZE = 256; /// allocazione statica
 int heap[MAX_SIZE];
 int posizione_nodi_heap[MAX_SIZE];
+int indice_minimo = -1;
 int heap_size = 0; /// dimensione attuale dell'heap
 ///FINE CODICE CERINELLI
 
@@ -273,6 +274,8 @@ void heap_insert(int elem) {
         //heap[i] = elem;
         heap[i] = V_dist[elem]; //Metto nell'heap base in posizione I la distanza alla posizione ELEM   -> heap[0] -> v_dist[10] -> posizione 0 valore nodo 10
         posizione_nodi_heap[elem] = i;
+        
+
         while (i != 0) {                          // non sono sulla radice
             if (heap[parent_idx(i)] <= heap[i] && heap[parent_idx(i)] != -1) { /// proprieta' dell' heap e' rispettata -> esco
                 if (details)
@@ -292,7 +295,9 @@ void heap_insert(int elem) {
             i = parent_idx(i);
             posizione_nodi_heap[elem] = i;
         }
-
+        if(i==0){
+            indice_minimo = elem;
+        }
     } else
         printf("Heap pieno!\n");
 }
@@ -310,9 +315,9 @@ void decrease_key(int indice_nodo, int key) { //non mi serve a nulla?
         return;
     }
 
-    heap[indice_nodo] = key;
+    heap[posizione_nodi_heap[indice_nodo]] = key;
 
-    int i = indice_nodo;
+    int i = posizione_nodi_heap[indice_nodo];
     while (i != 0) {                          // non sono sulla radice
         if (heap[parent_idx(i)] <= heap[i] && heap[parent_idx(i)] != -1) { /// proprieta' dell' heap e' rispettata -> esco
             if (details)
@@ -331,6 +336,11 @@ void decrease_key(int indice_nodo, int key) { //non mi serve a nulla?
         n_operazione++;
 
         i = parent_idx(i);
+        posizione_nodi_heap[indice_nodo] = i;
+    }
+    if(i==0)
+    {
+        indice_minimo = indice_nodo;
     }
 }
 
@@ -349,7 +359,7 @@ int heap_remove_min() {
     /// il minimo e' stato spostato in fondo --> pronto per l'eliminazione
     int radice = heap[0];
     heap[0] = heap[heap_size - 1];
-    posizione_nodi_heap[heap_size -1] = 0; //aggiorno posizione ultimo nodo nell'array di supporto
+    //posizione_nodi_heap[heap_size -1] = 0; //aggiorno posizione ultimo nodo nell'array di supporto
     heap[heap_size - 1] = radice;
 
     // elimino il minimo (ora in fondo all'array)
@@ -535,7 +545,7 @@ void shortest_path_originale(int n) {
             if (alt < V_dist[v]) {           // il percorso sorgente ---> u --> v migliora il percorso attuale sorgente --> v
                 V_dist[v] = alt;
                 V_prev[v] = u;
-                if(heap[v] == -1){ //prima volta che trovo il nodo
+                if(heap[posizione_nodi_heap[v]] == -1){ //prima volta che trovo il nodo
                     heap_insert(v);
                 }
                 else{
@@ -666,6 +676,7 @@ int main(int argc, char **argv) {
         V_prev[i] = -1;    // non c'e' precedente
         V_dist[i] = INFTY; // infinito
         heap[i] = -1;
+        posizione_nodi_heap[i] = i; //ogni nodo corrisponde alla cella pari dell'heap ( 1 -> 1, 2 -> 2 ecc...)
         E[i] = list_new();
 
         if (i == 0)
