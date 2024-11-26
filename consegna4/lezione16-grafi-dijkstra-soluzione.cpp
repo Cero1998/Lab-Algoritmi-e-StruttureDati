@@ -357,10 +357,10 @@ int heap_remove_min() {
         printf("Minimo identificato %d\n", minimo);
     /// scambio la radice con l'ultima foglia a destra
     /// il minimo e' stato spostato in fondo --> pronto per l'eliminazione
-    int radice = heap[0];
+    //int radice = heap[0];
     heap[0] = heap[heap_size - 1];
     //posizione_nodi_heap[heap_size -1] = 0; //aggiorno posizione ultimo nodo nell'array di supporto
-    heap[heap_size - 1] = radice;
+    heap[heap_size - 1] = minimo;
 
     // elimino il minimo (ora in fondo all'array)
     heap_size--;
@@ -416,7 +416,7 @@ int heap_remove_min() {
         // n_operazione++;
     }
 
-    return minimo;
+    return minimo; //indice_minimo?
 }
 // void minHeapify(int i) 
 // {
