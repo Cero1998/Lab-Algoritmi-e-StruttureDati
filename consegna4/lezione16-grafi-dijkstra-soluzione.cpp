@@ -66,7 +66,10 @@ float *V_dist;   // distanza da sorgente
 const int MAX_SIZE = 256; /// allocazione statica
 int heap[MAX_SIZE];
 int posizione_nodi_heap[MAX_SIZE];
+int array_support_heap_nodi[MAX_SIZE];
 int indice_minimo = -1;
+int indice_massimo_corrente = -1;
+int indice_massimo = -99;
 int heap_size = 0; /// dimensione attuale dell'heap
 ///FINE CODICE CERINELLI
 
@@ -264,6 +267,10 @@ void heap_insert(int elem) {
     /// nell'ultima posizione dell'array
     /// ovvero continuo a completare il livello corrente
 
+    if(indice_massimo == -99) //prima volta che entro nella heap inserti, quindi il massimo è per forza lui
+    {
+        indice_massimo = elem;
+    }
     if (details)
         printf("Inserisco elemento %d in posizione %d\n", elem, heap_size);
 
@@ -274,9 +281,10 @@ void heap_insert(int elem) {
         //heap[i] = elem;
         heap[i] = V_dist[elem]; //Metto nell'heap base in posizione I la distanza alla posizione ELEM   -> heap[0] -> v_dist[10] -> posizione 0 valore nodo 10
         posizione_nodi_heap[elem] = i;
-        
+        indice_massimo_corrente = elem; //il nodo con dist maggiore è l'ultimo inserito (per ora)
+        array_support_heap_nodi[i]=elem;
 
-        while (i != 0) {                          // non sono sulla radice
+        while (i != 0) { // non sono sulla radice
             if (heap[parent_idx(i)] <= heap[i] && heap[parent_idx(i)] != -1) { /// proprieta' dell' heap e' rispettata -> esco
                 if (details)
                     printf("Il genitore ha valore %d >= del nodo %d, esco\n", heap[parent_idx(i)], heap[i]);
@@ -289,14 +297,27 @@ void heap_insert(int elem) {
             int t = heap[parent_idx(i)];
             heap[parent_idx(i)] = heap[i];
             heap[i] = t;
+
+            int temp = posizione_nodi_heap[array_support_heap_nodi[parent_idx(i)]];
+            posizione_nodi_heap[array_support_heap_nodi[parent_idx(i)]] = posizione_nodi_heap[array_support_heap_nodi[i]];
+            posizione_nodi_heap[array_support_heap_nodi[i]] = temp;
+
+            int temp2 = array_support_heap_nodi[parent_idx(i)];
+            array_support_heap_nodi[parent_idx(i)] = array_support_heap_nodi[i];
+            array_support_heap_nodi[i] = temp2;
+
             // tree_print_graph(0); // radice
             // n_operazione++;
 
             i = parent_idx(i);
-            posizione_nodi_heap[elem] = i;
+            posizione_nodi_heap[elem] = i; //ridondante ???
         }
         if(i==0){
             indice_minimo = elem;
+        }
+        if(posizione_nodi_heap[indice_massimo_corrente] == (heap_size-1)) //il max è il nuovo inserito
+        {
+            indice_massimo = indice_massimo_corrente;
         }
     } else
         printf("Heap pieno!\n");
@@ -342,6 +363,7 @@ void decrease_key(int indice_nodo, int key) { //non mi serve a nulla?
     {
         indice_minimo = indice_nodo;
     }
+
 }
 
 int heap_remove_min() {
@@ -677,6 +699,7 @@ int main(int argc, char **argv) {
         V_dist[i] = INFTY; // infinito
         heap[i] = -1;
         posizione_nodi_heap[i] = i; //ogni nodo corrisponde alla cella pari dell'heap ( 1 -> 1, 2 -> 2 ecc...)
+        array_support_heap_nodi[i] = -1;
         E[i] = list_new();
 
         if (i == 0)
