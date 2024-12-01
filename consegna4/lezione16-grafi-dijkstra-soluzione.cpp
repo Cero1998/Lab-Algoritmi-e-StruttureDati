@@ -595,6 +595,7 @@ void shortest_path_cerinelli(int n)
     while (q_size != 0)
     {
 
+        graph_print();
         float nodo_con_dist_minore = heap_remove_min();
         /// estrai dalla coda
         int u = nodo_con_dist_minore;
