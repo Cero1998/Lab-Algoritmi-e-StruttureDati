@@ -68,9 +68,9 @@ const int MAX_SIZE = 256; /// allocazione statica
 int heap[MAX_SIZE];
 int posizione_nodi_heap[MAX_SIZE];
 int array_support_heap_nodi[MAX_SIZE];
-int indice_minimo = -1;
-int indice_massimo_corrente = -1;
-int indice_massimo = -99;
+int indice_minimo = -8888;
+int indice_massimo_corrente = -8888;
+int indice_massimo = -999;
 int heap_size = 0; /// dimensione attuale dell'heap
 /// FINE CODICE CERINELLI
 
@@ -292,7 +292,7 @@ void heap_insert(int elem)
     /// nell'ultima posizione dell'array
     /// ovvero continuo a completare il livello corrente
 
-    if (indice_massimo == -99) // prima volta che entro nella heap inserti, quindi il massimo è per forza lui
+    if (indice_massimo == -999) // prima volta che entro nella heap inserti, quindi il massimo è per forza lui
     {
         indice_massimo = elem;
     }
@@ -357,7 +357,7 @@ void decrease_key(int indice_nodo, int key)
 { // non mi serve a nulla?
     // key = nuovo valore
 
-    if (posizione_nodi_heap[indice_nodo] == -1)
+    if (posizione_nodi_heap[indice_nodo] == -8888)
     {
         printf("Nodo non esistente\n");
         return;
@@ -414,7 +414,7 @@ int heap_remove_min()
     if (heap_size <= 0)
     { /// heap vuoto!
         printf("Errore: heap vuoto\n");
-        return -1;
+        return -7777;
     }
 
     int minimo_heap = heap[0];
@@ -434,20 +434,16 @@ int heap_remove_min()
     posizione_nodi_heap[indice_massimo] = temp;
 
     int temp2 = array_support_heap_nodi[0];
-    array_support_heap_nodi[0] = array_support_heap_nodi[heap_size-1];
-    array_support_heap_nodi[heap_size-1]=temp2;
-
+    array_support_heap_nodi[0] = array_support_heap_nodi[heap_size - 1];
+    array_support_heap_nodi[heap_size - 1] = temp2;
 
     // elimino il minimo (ora in fondo all'array)
-    array_support_heap_nodi[heap_size-1]= -1;
-    posizione_nodi_heap[indice_minimo] = -1; // ??????
+    array_support_heap_nodi[heap_size - 1] = -8888;
+    posizione_nodi_heap[indice_minimo] = -8888; // ??????
     heap_size--;
     //    tree_print_graph(0);  // radice
 
-
-    //scambio anche gli indici minimo e massimo
-
-
+    // scambio anche gli indici minimo e massimo
 
     /// nella radice c'e' un valore Grande (massimo?)
     int i = 0; // indice di lavoro (parto dalla root)
@@ -458,7 +454,7 @@ int heap_remove_min()
         if (details)
             printf("Lavoro con il nodo in posizione i = %d, valore %d\n", i, heap[i]);
 
-        int con_chi_mi_scambio = -1;
+        int con_chi_mi_scambio = -8888;
 
         /// controllo il nodo i con il suo figlio L
         if (heap[i] > heap[child_L_idx(i)])
@@ -507,8 +503,6 @@ int heap_remove_min()
         array_support_heap_nodi[i] = array_support_heap_nodi[con_chi_mi_scambio];
         array_support_heap_nodi[con_chi_mi_scambio] = temp2;
 
-
-
         i = con_chi_mi_scambio;
         posizione_nodi_heap[2];
 
@@ -519,7 +513,8 @@ int heap_remove_min()
     return minimo_nodi; // indice_minimo?
 }
 
-void shortest_path_originale(int n) {
+void shortest_path_originale(int n)
+{
 
     /*      V_visitato[i]=0;  // flag = non visitato
       V_prev[i]=-1;  // non c'e' precedente
@@ -530,20 +525,24 @@ void shortest_path_originale(int n) {
 
     int q_size = n_nodi; /// contatore degli elementi in coda (V_visitato)
 
-    while (q_size != 0) {
+    while (q_size != 0)
+    {
 
         graph_print();
 
         /// trova il minimo in coda
         float best_dist = INFTY;
         int best_idx = -1;
-        for (int i = 0; i < n_nodi; i++) {
-            if (V_visitato[i] == 0 && V_dist[i] < best_dist) { /// nodo e' in coda e e' migliore del nodo corrente
+        for (int i = 0; i < n_nodi; i++)
+        {
+            if (V_visitato[i] == 0 && V_dist[i] < best_dist)
+            { /// nodo e' in coda e e' migliore del nodo corrente
                 best_dist = V_dist[i];
                 best_idx = i;
             }
         }
-        if (best_idx >= 0) {
+        if (best_idx >= 0)
+        {
             /// estrai dalla coda
             int u = best_idx;
             V_visitato[u] = 1;
@@ -551,19 +550,22 @@ void shortest_path_originale(int n) {
 
             /// esploro la lista di adiacenza
             node_t *elem = E[u]->head;
-            while (elem != NULL) {
+            while (elem != NULL)
+            {
                 int v = elem->val; /// arco u --> v
 
                 /// alt ← dist[u] + Graph.Edges(u, v)
                 float alt = V_dist[u] + elem->w; /// costo per arrivare al nuovo nodo passando per u
-                if (alt < V_dist[v]) {           // il percorso sorgente ---> u --> v migliora il percorso attuale sorgente --> v
+                if (alt < V_dist[v])
+                { // il percorso sorgente ---> u --> v migliora il percorso attuale sorgente --> v
                     V_dist[v] = alt;
                     V_prev[v] = u;
                 }
                 elem = elem->next;
             }
-
-        } else { /// coda non vuota E nodi non raggiungibili ---> FINITO
+        }
+        else
+        { /// coda non vuota E nodi non raggiungibili ---> FINITO
             q_size = 0;
         }
     }
@@ -597,35 +599,82 @@ void shortest_path_cerinelli(int n)
 
         graph_print();
         float nodo_con_dist_minore = heap_remove_min();
-        /// estrai dalla coda
-        int u = nodo_con_dist_minore;
-        V_visitato[u] = 1;
-        q_size--;
-
-        /// esploro la lista di adiacenza
-        node_t *elem = E[u]->head;
-        while (elem != NULL)
+        if (nodo_con_dist_minore >= 0)
         {
-            int v = elem->val; /// arco u --> v
+            /// estrai dalla coda
+            int u = nodo_con_dist_minore;
+            V_visitato[u] = 1;
+            q_size--;
 
-            /// alt ← dist[u] + Graph.Edges(u, v)
-            float alt = V_dist[u] + elem->w; /// costo per arrivare al nuovo nodo passando per u
-            if (alt < V_dist[v])
-            { // il percorso sorgente ---> u --> v migliora il percorso attuale sorgente --> v
-                V_dist[v] = alt;
-                V_prev[v] = u;
-                if (posizione_nodi_heap[v] == -1)
-                { // prima volta che trovo il nodo
-                    heap_insert(v);
+            /// esploro la lista di adiacenza
+            node_t *elem = E[u]->head;
+            while (elem != NULL)
+            {
+                int v = elem->val; /// arco u --> v
+
+                /// alt ← dist[u] + Graph.Edges(u, v)
+                float alt = V_dist[u] + elem->w; /// costo per arrivare al nuovo nodo passando per u
+                if (alt < V_dist[v])
+                { // il percorso sorgente ---> u --> v migliora il percorso attuale sorgente --> v
+                    V_dist[v] = alt;
+                    V_prev[v] = u;
+                    if (posizione_nodi_heap[v] == -8888)
+                    { // prima volta che trovo il nodo
+                        heap_insert(v);
+                    }
+                    else
+                    {
+                        decrease_key(v, alt);
+                    }
                 }
-                else
-                {
-                    decrease_key(v, alt);
-                }
+                elem = elem->next;
             }
-            elem = elem->next;
+        }
+        else
+        {
+            q_size = 0; /// coda non vuota E nodi non raggiungibili ---> FINITO
         }
     }
+}
+bool bellmanford_cerinelli(int elem)
+{
+    int n_nodes = n_nodi;
+
+    // Esegui n_nodes - 1 iterazioni per il Bellman-Ford
+    for (int i = 0; i < n_nodes - 1; i++) {
+        bool need_to_relax = false;
+
+        // Esegui shortest_path per trovare percorsi minimi
+        shortest_path_cerinelli(elem);
+
+        // Controlla se ci saranno relax
+        for (int u = 0; u < n_nodes; u++) {
+            node_t *elem = E[u]->head;
+
+            while (elem != NULL) {
+                int v = elem->val;
+                float alt = V_dist[u] + elem->w;
+                
+                if (alt < V_dist[v]) {
+                    need_to_relax = true;
+                }
+                elem = elem->next;
+            }
+        }
+
+        // Se non servirà fare nessun relax, il ciclo è ottimale e non c'è bisogno di ulteriori iterazioni
+        if (!need_to_relax) {
+            break;
+        }
+
+        if (i == n_nodes - 2 && need_to_relax == true) {
+            printf("Ciclo negativo trovato!\n");
+            return true;
+        }
+    }
+
+    printf("Nessun ciclo negativo!\n");
+    return false; 
 }
 
 int DFS(int n)
@@ -737,7 +786,7 @@ int main(int argc, char **argv)
     int N = 10;
     n_nodi = N * N;
 
-    n_nodi = 10;
+    n_nodi = 5;
 
     //// init nodi
     V = new int[n_nodi];
@@ -755,9 +804,9 @@ int main(int argc, char **argv)
         V_visitato[i] = 0; // flag = non visitato
         V_prev[i] = -1;    // non c'e' precedente
         V_dist[i] = INFTY; // infinito
-        heap[i] = -1;
-        posizione_nodi_heap[i] = -1; // ogni nodo corrisponde alla cella pari dell'heap ( 1 -> 1, 2 -> 2 ecc...)
-        array_support_heap_nodi[i] = -1;
+        heap[i] = -8888;
+        posizione_nodi_heap[i] = -8888; // ogni nodo corrisponde alla cella pari dell'heap ( 1 -> 1, 2 -> 2 ecc...)
+        array_support_heap_nodi[i] = -8888;
         E[i] = list_new();
 
         if (i == 0)
@@ -788,14 +837,14 @@ int main(int argc, char **argv)
     int arrivo = n_nodi - 1;
     int w_max = 100;
 
-    for (int i = 0; i < n_nodi - 1; i++)
-    {
-        /// arco costoso
-        list_insert_front(E[i], arrivo, w_max - 2 * i);
-        /// arco 1
-        if (i > 0)
-            list_insert_front(E[i - 1], i, 1);
-    }
+    // for (int i = 0; i < n_nodi - 1; i++)
+    // {
+    //     /// arco costoso
+    //     list_insert_front(E[i], arrivo, w_max - 2 * i);
+    //     /// arco 1
+    //     if (i > 0)
+    //         list_insert_front(E[i - 1], i, 1);
+    // }
 
     graph_print();
 
@@ -809,6 +858,15 @@ int main(int argc, char **argv)
 
     shortest_path_cerinelli(0);
     // shortest_path(44);
+
+    list_insert_front(E[0], 1, 3);
+    list_insert_front(E[0], 2, 2);
+    list_insert_front(E[1], 3, 4);
+    list_insert_front(E[2], 3, -3);
+    list_insert_front(E[4], 2, 1);
+    list_insert_front(E[3], 4, 1);
+
+    bellmanford_cerinelli(0);
 
     if (graph)
     {
