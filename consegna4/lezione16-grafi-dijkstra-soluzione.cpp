@@ -638,43 +638,29 @@ void shortest_path_cerinelli(int n)
 }
 bool bellmanford_cerinelli(int elem)
 {
-    int n_nodes = n_nodi;
-
-    // Esegui n_nodes - 1 iterazioni per il Bellman-Ford
-    for (int i = 0; i < n_nodes - 1; i++) {
-        bool need_to_relax = false;
-
-        // Esegui shortest_path per trovare percorsi minimi
-        shortest_path_cerinelli(elem);
-
-        // Controlla se ci saranno relax
-        for (int u = 0; u < n_nodes; u++) {
-            node_t *elem = E[u]->head;
-
-            while (elem != NULL) {
-                int v = elem->val;
-                float alt = V_dist[u] + elem->w;
-                
-                if (alt < V_dist[v]) {
-                    need_to_relax = true;
-                }
-                elem = elem->next;
-            }
-        }
-
-        // Se non servirà fare nessun relax, il ciclo è ottimale e non c'è bisogno di ulteriori iterazioni
-        if (!need_to_relax) {
-            break;
-        }
-
-        if (i == n_nodes - 2 && need_to_relax == true) {
-            printf("Ciclo negativo trovato!\n");
-            return true;
-        }
+    for (int i = 0; i < n_nodi - 1; i++)
+    {
+        shortest_path_cerinelli(elem); // rilasso per n_nodi -1 volte gli archi
     }
 
-    printf("Nessun ciclo negativo!\n");
-    return false; 
+    // Controllo per cicli negativi
+    for (int u = 0; u < n_nodi; u++)
+    {
+        node_t *elem = E[u]->head;
+        while (elem != NULL)
+        {
+            int v = elem->val;
+            float alt = V_dist[u] + elem->w;
+            if (alt < V_dist[v])
+            {
+                cout << "Errore: Ciclo negativo!!!" << endl;
+                return false;
+            }
+            elem = elem->next;
+        }
+    }
+    cout << "Nessun Ciclo Negativo" << endl;
+    return true;
 }
 
 int DFS(int n)
@@ -862,7 +848,7 @@ int main(int argc, char **argv)
     list_insert_front(E[0], 1, 3);
     list_insert_front(E[0], 2, 2);
     list_insert_front(E[1], 3, 4);
-    list_insert_front(E[2], 3, -3);
+    list_insert_front(E[2], 3, -2);
     list_insert_front(E[4], 2, 1);
     list_insert_front(E[3], 4, 1);
 
