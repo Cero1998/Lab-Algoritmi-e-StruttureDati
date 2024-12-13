@@ -84,254 +84,6 @@ int n_nodi;
 
 list_t *global_ptr_ref = NULL; /// usato per memorizzare il puntatore alla prima lista allocata
 
-int get_address(void *node) {
-    return (int)((long)node - (long)global_ptr_ref);
-}
-
-void node_print(int n) {
-
-    output_graph << "node_" << n << "_" << n_operazione << endl;
-    output_graph << "[ shape = oval; ";
-    if (V_visitato[n] == -1)
-        output_graph << "fillcolor = \"#aaaaaa\"; style=filled; ";
-    output_graph << "label = "
-                 << "\"Idx: " << n << ", val: " << V[n] << " index: " << V_visitato[n] << " lowlink: " << V_lowlink[n] << "\" ];\n";
-
-    node_t *elem = E[n]->head;
-    while (elem != NULL) { /// disegno arco
-        output_graph << "node_" << n << "_" << n_operazione << " -> ";
-        output_graph << "node_" << elem->val << "_" << n_operazione << " [  color=gray ]\n";
-        elem = elem->next;
-    }
-}
-
-void graph_print() {
-    for (int i = 0; i < n_nodi; i++)
-        node_print(i);
-    n_operazione++;
-}
-
-void list_print(list_t *l) {
-    printf("Stampa lista\n");
-
-    if (l->head == NULL) {
-        printf("Lista vuota\n");
-    } else {
-        node_t *current = l->head;
-
-        while (current != NULL) {
-            if (!details)
-                printf("%d, ", current->val);
-            else { /// stampa completa
-                if (current->next == NULL)
-                    printf("allocato in %d [Val: %d, Next: NULL]\n",
-                           get_address(current),
-                           current->val);
-                else
-                    printf("allocato in %d [Val: %d, Next: %d]\n",
-                           get_address(current),
-                           current->val,
-                           get_address(current->next));
-            }
-            current = current->next;
-        }
-        printf("\n");
-    }
-}
-
-list_t *list_new(void) {
-    list_t *l = new list;
-    if (details) {
-        printf("Lista creata\n");
-    }
-
-    l->head = NULL; //// perche' non e' l.head ?
-    if (details) {
-        printf("Imposto a NULL head\n");
-    }
-
-    return l;
-}
-
-void list_delete(list_t *l) {
-    //// implementare rimozione dal fondo della lista
-    //// deallocazione struct list
-}
-
-void list_insert_front(list_t *l, int elem) {
-    /// inserisce un elemento all'inizio della lista
-    node_t *new_node = new node_t;
-    new_node->next = NULL;
-
-    new_node->val = elem;
-
-    new_node->next = l->head;
-
-    l->head = new_node;
-}
-
-void list_delete_front(list_t *l) {
-    /// elimina il primo elemento della lista
-    node_t *node = l->head; // il nodo da eliminare
-
-    if (node == NULL) // lista vuota
-        return;
-
-    l->head = node->next;
-
-    // if (graph) print_status(l,node,"DEL FRONT: aggancio lista a nodo successivo");
-
-    node->next = NULL;
-
-    // if (graph) print_status(l,node,"DEL FRONT: sgancio puntatore da nodo da cancellare");
-
-    delete node;
-
-    //  if (graph) print_status(l,NULL,"DEL FRONT: cancello nodo");
-}
-
-////////// operazioni stack
-
-my_stack *stack_new() {
-    return list_new();
-}
-
-int stack_top(my_stack *s) {
-    if (s->head != NULL)
-        return s->head->val;
-    printf("ERRORE: stack vuoto!\n");
-    return -1;
-}
-
-int stack_pop(my_stack *s) {
-    if (s->head != NULL) {
-        int v = s->head->val;
-        list_delete_front((list_t *)s);
-        return v;
-    }
-    printf("ERRORE: stack vuoto!\n");
-    return -1;
-}
-
-void stack_push(my_stack *s, int v) {
-    list_insert_front((list_t *)s, v);
-}
-
-void stack_print(my_stack *s) {
-    list_print((list_t *)s);
-}
-
-void print_array(int *A, int dim) {
-    for (int j = 0; j < dim; j++) {
-        printf("%d ", A[j]);
-    }
-    printf("\n");
-}
-
-void print_array_graph(int *A, int n, string c, int a, int l, int m, int r) {
-    /// prepara il disegno dell'array A ed il suo contenuto (n celle)
-    /// a e' il codice del nodo e c la stringa
-    /// l,m,r i tre indici della bisezione
-
-    // return ;
-
-    output_graph << c << a << " [label=<" << endl;
-
-    /// tabella con contenuto array
-    output_graph << "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" > " << endl;
-    /// indici
-    output_graph << "<TR  >";
-    for (int j = 0; j < n; j++) {
-        output_graph << "<TD ";
-        output_graph << ">" << j << "</TD>" << endl;
-    }
-    output_graph << "</TR>" << endl;
-    output_graph << "<TR>";
-    // contenuto
-    for (int j = 0; j < n; j++) {
-        output_graph << "<TD BORDER=\"1\"";
-        if (j == m)
-            output_graph << " bgcolor=\"#00a000\""; /// valore testato
-        else if (j >= l && j <= r)
-            output_graph << " bgcolor=\"#80ff80\""; /// range di competenza
-        output_graph << ">" << A[j] << "</TD>" << endl;
-    }
-    output_graph << "</TR>" << endl;
-    output_graph << "</TABLE> " << endl;
-
-    output_graph << ">];" << endl;
-}
-
-void scc(int v) {
-
-    graph_print();
-
-    V_visitato[v] = idx;
-    V_lowlink[v] = idx;
-    idx = idx + 1;
-    printf("push %d\n", v);
-    stack_push(s, v);
-    V_onStack[v] = 1;
-
-    /// esploro la lista di adiacenza
-    node_t *elem = E[v]->head;
-    while (elem != NULL) { /// elenco tutti i nodi nella lista
-
-        output_graph << "node_" << v << "_" << n_operazione << " -> ";
-        output_graph << "node_" << elem->val << "_" << n_operazione << "[color=blue, label = \"" << ct_visit++ << "\"]\n";
-
-        graph_print();
-
-        // /// espando arco  n --> elem->val
-        // /// quindi DFS(elem->val)
-        // output_graph << "dfs_"<< n << " -> dfs_"<< elem->val;
-        // if (V_visitato[elem->val])
-        //   output_graph << "[color=gray, label = \""<< ct_visit++<< "\"]";
-        // else
-        //   output_graph << "[color=red, label = \""<< ct_visit++<< "\"]";
-        // output_graph  <<endl;
-
-        int w = elem->val;
-        printf("esploro %d -> %d\n", v, w);
-
-        if (V_visitato[w] == -1) {
-            printf("chiamo scc su %d\n", w);
-            scc(w);
-            if (V_lowlink[v] > V_lowlink[w]) // calcolo v.lowlink := min(v.lowlink, w.lowlink)
-                V_lowlink[v] = V_lowlink[w];
-        } else {
-            if (V_onStack[w] == 1)
-                if (V_lowlink[v] > V_visitato[w]) // calcolo v.lowlink := min(v.lowlink, w.index)
-                    V_lowlink[v] = V_visitato[w];
-        }
-
-        elem = elem->next;
-    }
-
-    printf("finito il nodo %d\n", v);
-
-    if (V_lowlink[v] == V_visitato[v]) {
-        // start a new strongly connected component
-        printf("Nuova componente connessa %d : ", v);
-
-        int w = -1;
-        do {
-            w = stack_pop(s);
-            V_onStack[w] = 0;
-            printf("%d, ", w);
-        } while (v != w); /// w!=v
-        printf("\n");
-    }
-}
-
-void swap(int &a, int &b) {
-    int tmp = a;
-    a = b;
-    b = tmp;
-    /// aggiorno contatore globale di swap
-    ct_swap++;
-}
-
 int parse_cmd(int argc, char **argv) {
     /// controllo argomenti
     int ok_parse = 0;
@@ -355,25 +107,6 @@ int parse_cmd(int argc, char **argv) {
     }
 
     return 0;
-}
-
-int ct_fib = 0;
-
-int fib(int n) {
-    ct_fib++;
-
-    if (V[n] != 0)
-        return V[n];
-
-    // non conosco la risposta
-    int risposta = 0;
-
-    if (n <= 2)
-        risposta = 1;
-    else
-        risposta = fib(n - 1) + fib(n - 2);
-    V[n] = risposta;
-    return risposta;
 }
 
 int is_match(char temp1, char temp2) {
@@ -602,7 +335,26 @@ int main(int argc, char **argv) {
 
     // printf("fib: %d (n chiamate %d)\n", fib(30), ct_fib);
 
-    allinea();
+    // allinea();
+
+
+    //INIZIO CODICE CERINELLI
+    ifstream stream1;
+    stream1.open("file1.cpp");
+    stream1.seekg(0, std::ios::end); //vai alla fine del file
+    size_t size = stream1.tellg(); //prendi la size
+    char *file1 = new char[size + 1];
+    stream1.seekg(0); //torna all'inizio del file
+    stream1.read(file1, size); 
+
+    for(int i =0; i<=size; i++)
+    {
+        cout<<file1[i];
+    }
+
+
+
+
 
     return 0;
 }
