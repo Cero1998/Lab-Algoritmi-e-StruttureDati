@@ -360,28 +360,47 @@ void allinea()
     }
     printf("\n");
 }
+/// INIZIO CODICE CERINELLI
 
-char *getStringFromFile(const char *nameFile, int &sizeFile)
+char *getStringFromFileWithoutCarrelReturn(const char *nameFile, int &sizeFile)
 {
-    ifstream stream1;   // apro input stream
-    stream1.open(nameFile); // apro file
-    stream1.seekg(0, std::ios::end);    // vai alla fine del file
-    size_t size = stream1.tellg();  // prendi la size
+    ifstream stream1;                // apro input stream
+    stream1.open(nameFile);          // apro file
+    stream1.seekg(0, std::ios::end); // vai alla fine del file
+    size_t size = stream1.tellg();   // prendi la size
 
-    char* contentOfFile = new char[size + 1];   // creo variabile che contiene contenuto del file
-    stream1.seekg(0);   // torna all'inizio del file
-    stream1.read(contentOfFile, size);  // popolo variabile
+    char *contentOfFile = new char[size + 1]; // creo variabile che contiene contenuto del file
+    stream1.seekg(0);                         // torna all'inizio del file
+    stream1.read(contentOfFile, size);        // popolo variabile
 
-    char* newContent = new char[size + 1];  // Creo variabile per nuovo file senza \n
-    int newSize = 0;    // Nuova dimensione nuova stringa senza \n
-    
-    for (int i = 0; i < size; i++) { //ciclo per togliere \n
-        if (contentOfFile[i] != '\n') {
+    char *newContent = new char[size + 1]; // Creo variabile per nuovo file senza \n
+    int newSize = 0;                       // Nuova dimensione nuova stringa senza \n
+
+    for (int i = 0; i < size; i++)
+    { // ciclo per togliere \n
+        if (contentOfFile[i] != '\n')
+        {
             newContent[newSize++] = contentOfFile[i];
         }
     }
+    newContent[newSize]='\0';
     sizeFile = newSize;
     return newContent;
+}
+
+char *getStringFromFileWithCarrelReturn(const char *nameFile, int &sizeFile)
+{
+    ifstream stream1;                // apro input stream
+    stream1.open(nameFile);          // apro file
+    stream1.seekg(0, std::ios::end); // vai alla fine del file
+    size_t size = stream1.tellg();   // prendi la size
+
+    char *contentOfFile = new char[size + 1]; // creo variabile che contiene contenuto del file
+    stream1.seekg(0);                         // torna all'inizio del file
+    stream1.read(contentOfFile, size);        // popolo variabile
+    contentOfFile[size]='\0';
+    sizeFile = size;
+    return contentOfFile;
 }
 
 void longestCommonSubstring()
@@ -404,11 +423,11 @@ void longestCommonSubstring()
     {
         for (int y = 1; y < sizeFile2 + 1; y++)
         {
-            //se è lo stesso carattere
-            if (file1[x - 1] == file2[y - 1]) 
+            // se è lo stesso carattere
+            if (file1[x - 1] == file2[y - 1])
             {
-                //se ho due spazi riporto il risultato vecchio, cosi' int main == int      main
-                if(file1[x-1] == ' ' && file1[x] == ' ' && file2[y-1] == ' ' && file2[y] == ' ')
+                // se ho due spazi riporto il risultato vecchio, cosi' int main == int      main
+                if (file1[x - 1] == ' ' && file1[x] == ' ' && file2[y - 1] == ' ' && file2[y] == ' ')
                 {
                     matrixLCS[x][y] = matrixLCS[x - 1][y - 1];
                     continue;
@@ -419,20 +438,21 @@ void longestCommonSubstring()
                 {
                     maxLCS = matrixLCS[x][y];
                     LCSXcoordinate = x - 1;
+                    LCSYCoordinate = y - 1;
                 }
             }
         }
     }
 
     // Stampo matrice con diagonali per LCS
-    for(int i = 0; i<=sizeFile2;i++)
+    for (int i = 0; i <= sizeFile2; i++)
     {
         if (i == 0)
             cout << "  -";
         else
-            cout << file2[i-1];
+            cout << file2[i - 1];
     }
-    cout<<endl;
+    cout << endl;
     for (int x = 0; x < sizeFile1 + 1; x++)
     {
         if (x == 0)
@@ -448,12 +468,39 @@ void longestCommonSubstring()
 
     // Stampo la longest common substring:
     cout << "Longest common substring: ";
-    for (int i = 0; i <= maxLCS; i++)
+    int i = 0;
+    int posizioneCarattereFinale = LCSXcoordinate;
+    while (matrixLCS[LCSXcoordinate][LCSYCoordinate] != 0) // risalgo la diagonale finche' non arrivo a 0
     {
-        cout << file1[LCSXcoordinate - maxLCS + i];
+        if (file1[posizioneCarattereFinale - maxLCS + (i + 1)] != ' ')
+            cout << file1[posizioneCarattereFinale - maxLCS + (i + 1)]; // stampo non al contrario la stringa
+        i++;
+        LCSXcoordinate--;
+        LCSYCoordinate--;
     }
     cout << endl;
 }
+
+void checkDifferences()
+{   
+    //chiesto a chatgpt come fare la split di un puntatore a char
+    char* saveptr1;
+    char* saveptr2;
+    char* file1Splitted = strtok_r(file1, "\n", &saveptr1);
+    char* file2Splitted = strtok_r(file2, "\n", &saveptr2);
+
+    while(file1Splitted != nullptr && file2Splitted != nullptr)
+    {
+        if(strcmp(file1Splitted,file2Splitted))
+        {
+            cout<<"CODICE CAMBIATO! File1-> "<<file1Splitted<<" Vs "<<file2Splitted<<" <-File2"<<endl;
+        }
+
+        file1Splitted = strtok_r(nullptr, "\n", &saveptr1);
+        file2Splitted = strtok_r(nullptr, "\n", &saveptr2);
+    }
+}
+
 
 
 int main(int argc, char **argv)
@@ -473,14 +520,23 @@ int main(int argc, char **argv)
 
     // allinea();
 
+
+
     // INIZIO CODICE CERINELLI
 
-    file1 = getStringFromFile("file1.cpp", sizeFile1);
-    file2 = getStringFromFile("file2.cpp", sizeFile2);
-
+    file1 = getStringFromFileWithoutCarrelReturn("file1.cpp", sizeFile1);
+    file2 = getStringFromFileWithoutCarrelReturn("file2.cpp", sizeFile2);
+    // for(int i =0;i<sizeFile1;i++)
+    //     cout<<file1[i];
     longestCommonSubstring();
+    cout<<endl<<endl<<endl<<endl<<endl;
 
-    
+    file1 = getStringFromFileWithCarrelReturn("file1.cpp", sizeFile1);
+    file2 = getStringFromFileWithCarrelReturn("file2.cpp", sizeFile2);
+    // for(int i =0;i<sizeFile1;i++)
+    //     cout<<file1[i];
+
+    checkDifferences();
 
     return 0;
 }
