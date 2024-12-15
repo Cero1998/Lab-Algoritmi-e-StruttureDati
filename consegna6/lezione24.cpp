@@ -42,13 +42,15 @@ int idx = 0;
 //////////////////////////////////////////////////
 
 /// struct per il nodo della lista
-typedef struct node {
+typedef struct node
+{
     int val;
     struct node *next;
 } node_t;
 
 /// struct per la lista
-typedef struct list {
+typedef struct list
+{
     node *head;
     // node* tail; /// per lista doubly linked
 } list_t;
@@ -84,21 +86,40 @@ int n_nodi;
 
 list_t *global_ptr_ref = NULL; /// usato per memorizzare il puntatore alla prima lista allocata
 
-int parse_cmd(int argc, char **argv) {
+// INIZIO CODICE CERINELLI
+
+char *file1;
+char *file2;
+
+int sizeFile1;
+int sizeFile2;
+
+int maxLCS = 0;
+int LCSXcoordinate;
+int LCSYCoordinate;
+
+// FINE CODICE CERINELLI
+
+int parse_cmd(int argc, char **argv)
+{
     /// controllo argomenti
     int ok_parse = 0;
-    for (int i = 1; i < argc; i++) {
-        if (argv[i][1] == 'v') {
+    for (int i = 1; i < argc; i++)
+    {
+        if (argv[i][1] == 'v')
+        {
             details = 1;
             ok_parse = 1;
         }
-        if (argv[i][1] == 'g') {
+        if (argv[i][1] == 'g')
+        {
             graph = 1;
             ok_parse = 1;
         }
     }
 
-    if (argc > 1 && !ok_parse) {
+    if (argc > 1 && !ok_parse)
+    {
         printf("Usage: %s [Options]\n", argv[0]);
         printf("Options:\n");
         printf("  -verbose: Abilita stampe durante l'esecuzione dell'algoritmo\n");
@@ -109,7 +130,8 @@ int parse_cmd(int argc, char **argv) {
     return 0;
 }
 
-int is_match(char temp1, char temp2) {
+int is_match(char temp1, char temp2)
+{
     if ((temp1 == temp2) ||
         ((temp1 >= 'a' && temp1 <= 'z') &&
          (temp2 >= 'a' && temp2 <= 'z')))
@@ -120,10 +142,12 @@ int is_match(char temp1, char temp2) {
     return 0;
 }
 
-int fscore(char temp1, char temp2) {
+int fscore(char temp1, char temp2)
+{
 
     /// match
-    if (temp1 == temp2) {
+    if (temp1 == temp2)
+    {
 
         if (temp1 == '(' ||
             temp1 == ')' ||
@@ -150,7 +174,8 @@ int fscore(char temp1, char temp2) {
     return 0;
 }
 
-void allinea() {
+void allinea()
+{
     const int s1 = 20;
     const int s2 = 20;
 
@@ -168,10 +193,12 @@ void allinea() {
     int costo_mismatch = -1;
     int costo_indel = -1;
 
-    for (i = 0; i < s1; i++) {
+    for (i = 0; i < s1; i++)
+    {
         str1[i] = temp1[i];
     }
-    for (i = 0; i < s2; i++) {
+    for (i = 0; i < s2; i++)
+    {
         str2[i] = temp2[i];
     }
 
@@ -200,22 +227,27 @@ void allinea() {
         P[0][j] = 1;
 
     for (int i = 1; i < s1 + 1; i++)
-        for (int j = 1; j < s2 + 1; j++) {
+        for (int j = 1; j < s2 + 1; j++)
+        {
 
             /// sottosequenza
             int score = fscore(str1[i - 1], str2[j - 1]);
 
-            if (score != 0) { // match/mismatch
+            if (score != 0)
+            { // match/mismatch
                 M[i][j] = score + M[i - 1][j - 1];
                 P[i][j] = 2;
-            } else { /// insertion/deletion
+            }
+            else
+            { /// insertion/deletion
 
                 int max = M[i - 1][j];
                 char corrente = str1[i - 1];
                 char precedente = str1[i - 2];
 
                 P[i][j] = 0;
-                if (max < M[i][j - 1]) {
+                if (max < M[i][j - 1])
+                {
                     max = M[i][j - 1];
                     P[i][j] = 1;
                     char corrente = str2[j - 1];
@@ -265,7 +297,8 @@ void allinea() {
             // }
         }
 
-    for (int i = 0; i < s1 + 1; i++) {
+    for (int i = 0; i < s1 + 1; i++)
+    {
 
         // if (i == 0) {
         //     printf("   ");
@@ -276,13 +309,15 @@ void allinea() {
 
         printf("%2d %c: ", i, i > 0 ? str1[i - 1] : ' ');
 
-        for (int j = 0; j < s2 + 1; j++) {
+        for (int j = 0; j < s2 + 1; j++)
+        {
             printf("%2d ", M[i][j]);
         }
         printf("\n");
     }
 
-    for (int i = 0; i < s1 + 1; i++) {
+    for (int i = 0; i < s1 + 1; i++)
+    {
 
         // if (i == 0) {
         //     printf("   ");
@@ -293,7 +328,8 @@ void allinea() {
 
         printf("%2d %c: ", i, i > 0 ? str1[i - 1] : ' ');
 
-        for (int j = 0; j < s2 + 1; j++) {
+        for (int j = 0; j < s2 + 1; j++)
+        {
             printf("%d ", P[i][j]);
         }
         printf("\n");
@@ -303,13 +339,17 @@ void allinea() {
     int j = s2;
 
     // ricostruzione sottosequenza
-    while (i > 0 || j > 0) {
+    while (i > 0 || j > 0)
+    {
         // printf("posizione: %d %d\n", i, j);
-        if (P[i][j] == 2) {
+        if (P[i][j] == 2)
+        {
             printf("%c", str1[i - 1]);
             i--;
             j--;
-        } else {
+        }
+        else
+        {
             // if M(i,j) = M(i−1,j) then i ← i−1 else j ← j−1
             printf("_");
             if (P[i][j] == 0)
@@ -321,7 +361,100 @@ void allinea() {
     printf("\n");
 }
 
-int main(int argc, char **argv) {
+char *getStringFromFile(const char *nameFile, int &sizeFile)
+{
+    ifstream stream1;   // apro input stream
+    stream1.open(nameFile); // apro file
+    stream1.seekg(0, std::ios::end);    // vai alla fine del file
+    size_t size = stream1.tellg();  // prendi la size
+
+    char* contentOfFile = new char[size + 1];   // creo variabile che contiene contenuto del file
+    stream1.seekg(0);   // torna all'inizio del file
+    stream1.read(contentOfFile, size);  // popolo variabile
+
+    char* newContent = new char[size + 1];  // Creo variabile per nuovo file senza \n
+    int newSize = 0;    // Nuova dimensione nuova stringa senza \n
+    
+    for (int i = 0; i < size; i++) { //ciclo per togliere \n
+        if (contentOfFile[i] != '\n') {
+            newContent[newSize++] = contentOfFile[i];
+        }
+    }
+    sizeFile = newSize;
+    return newContent;
+}
+
+void longestCommonSubstring()
+{
+    int matrixLCS[sizeFile1 + 1][sizeFile2 + 1]; // cremo matrice di grandezza file1 * file2
+
+    // CIclo popolo matrice tutta a 0 + stampa
+    cout << "  -" << file2 << endl;
+    for (int x = 0; x < sizeFile1 + 1; x++)
+    {
+        if (x == 0)
+            cout << "- ";
+        else
+            cout << file1[x - 1] << " ";
+        for (int y = 0; y < sizeFile2 + 1; y++)
+        {
+            matrixLCS[x][y] = 0;
+            cout << matrixLCS[x][y];
+        }
+        cout << endl;
+    }
+
+    // ciclo per individuazione longest common substring
+    // aggiungo +1 a file size per permettere la riga e colonna vuota
+    // tolgo -1 perchè la stringa è rimasta invariata e non la il carattere vuoto
+    for (int x = 1; x < sizeFile1 + 1; x++)
+    {
+        for (int y = 1; y < sizeFile2 + 1; y++)
+        {
+            //se è lo stesso carattere
+            if (file1[x - 1] == file2[y - 1]) 
+            {
+                //se ho due spazi di fila salto la verifica
+                if(file1[x-1] == ' ' && file1[x] == ' ' && file2[y-1] == ' ' && file2[y] == ' ')
+                    continue;
+                
+                matrixLCS[x][y] = matrixLCS[x - 1][y - 1] + 1;
+                if (maxLCS < matrixLCS[x][y])
+                {
+                    maxLCS = matrixLCS[x][y];
+                    LCSXcoordinate = x - 1;
+                }
+            }
+        }
+    }
+
+    // Stampo matrice con diagonali per LCS
+    cout << "  -" << file2 << endl;
+    for (int x = 0; x < sizeFile1 + 1; x++)
+    {
+        if (x == 0)
+            cout << "- ";
+        else
+            cout << file1[x - 1] << " ";
+        for (int y = 0; y < sizeFile2 + 1; y++)
+        {
+            cout << matrixLCS[x][y];
+        }
+        cout << endl;
+    }
+
+    // Stampo la longest common substring:
+    cout << "Longest common substring: ";
+    for (int i = 0; i <= maxLCS; i++)
+    {
+        cout << file1[LCSXcoordinate - maxLCS + i];
+    }
+    // cout<< file1[LCSXcoordinate - maxLCS]<<endl; //aggiunto perchè il for termina prima di stampare l'ultimo char
+    cout << endl;
+}
+
+int main(int argc, char **argv)
+{
     int i, test;
 
     srand((unsigned)time(NULL));
@@ -337,24 +470,12 @@ int main(int argc, char **argv) {
 
     // allinea();
 
+    // INIZIO CODICE CERINELLI
 
-    //INIZIO CODICE CERINELLI
-    ifstream stream1;
-    stream1.open("file1.cpp");
-    stream1.seekg(0, std::ios::end); //vai alla fine del file
-    size_t size = stream1.tellg(); //prendi la size
-    char *file1 = new char[size + 1];
-    stream1.seekg(0); //torna all'inizio del file
-    stream1.read(file1, size); 
+    file1 = getStringFromFile("file1.cpp", sizeFile1);
+    file2 = getStringFromFile("file2.cpp", sizeFile2);
 
-    for(int i =0; i<=size; i++)
-    {
-        cout<<file1[i];
-    }
-
-
-
-
+    longestCommonSubstring();
 
     return 0;
 }
