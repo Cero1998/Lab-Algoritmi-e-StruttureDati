@@ -425,7 +425,14 @@ void longestCommonSubstring()
     }
 
     // Stampo matrice con diagonali per LCS
-    cout << "  -" << file2 << endl;
+    for(int i = 0; i<=sizeFile2;i++)
+    {
+        if (i == 0)
+            cout << "  -";
+        else
+            cout << file2[i-1];
+    }
+    cout<<endl;
     for (int x = 0; x < sizeFile1 + 1; x++)
     {
         if (x == 0)
@@ -447,6 +454,7 @@ void longestCommonSubstring()
     }
     cout << endl;
 }
+
 
 int main(int argc, char **argv)
 {
