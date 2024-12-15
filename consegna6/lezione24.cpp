@@ -388,20 +388,13 @@ void longestCommonSubstring()
 {
     int matrixLCS[sizeFile1 + 1][sizeFile2 + 1]; // cremo matrice di grandezza file1 * file2
 
-    // CIclo popolo matrice tutta a 0 + stampa
-    cout << "  -" << file2 << endl;
+    // popolo matrice tutta a 0
     for (int x = 0; x < sizeFile1 + 1; x++)
     {
-        if (x == 0)
-            cout << "- ";
-        else
-            cout << file1[x - 1] << " ";
         for (int y = 0; y < sizeFile2 + 1; y++)
         {
             matrixLCS[x][y] = 0;
-            cout << matrixLCS[x][y];
         }
-        cout << endl;
     }
 
     // ciclo per individuazione longest common substring
@@ -414,10 +407,13 @@ void longestCommonSubstring()
             //se è lo stesso carattere
             if (file1[x - 1] == file2[y - 1]) 
             {
-                //se ho due spazi di fila salto la verifica
+                //se ho due spazi riporto il risultato vecchio, cosi' int main == int      main
                 if(file1[x-1] == ' ' && file1[x] == ' ' && file2[y-1] == ' ' && file2[y] == ' ')
+                {
+                    matrixLCS[x][y] = matrixLCS[x - 1][y - 1];
                     continue;
-                
+                }
+
                 matrixLCS[x][y] = matrixLCS[x - 1][y - 1] + 1;
                 if (maxLCS < matrixLCS[x][y])
                 {
@@ -449,7 +445,6 @@ void longestCommonSubstring()
     {
         cout << file1[LCSXcoordinate - maxLCS + i];
     }
-    // cout<< file1[LCSXcoordinate - maxLCS]<<endl; //aggiunto perchè il for termina prima di stampare l'ultimo char
     cout << endl;
 }
 
@@ -476,6 +471,8 @@ int main(int argc, char **argv)
     file2 = getStringFromFile("file2.cpp", sizeFile2);
 
     longestCommonSubstring();
+
+    
 
     return 0;
 }
