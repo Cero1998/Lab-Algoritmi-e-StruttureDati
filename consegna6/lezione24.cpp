@@ -437,8 +437,8 @@ void longestCommonSubstring()
                 if (maxLCS < matrixLCS[x][y])
                 {
                     maxLCS = matrixLCS[x][y];
-                    LCSXcoordinate = x - 1;
-                    LCSYCoordinate = y - 1;
+                    LCSXcoordinate = x;
+                    LCSYCoordinate = y;
                 }
             }
         }
@@ -468,17 +468,27 @@ void longestCommonSubstring()
 
     // Stampo la longest common substring:
     cout << "Longest common substring: ";
+    const int maxSize = 100; // Dimensione massima della stringa
+    char bufferReversedString[maxSize] = ""; // Inizializziamo il buffer con una stringa vuota
+    int currentLength = 0; // Lunghezza attuale della stringa
+
     int i = 0;
     int posizioneCarattereFinale = LCSXcoordinate;
     while (matrixLCS[LCSXcoordinate][LCSYCoordinate] != 0) // risalgo la diagonale finche' non arrivo a 0
     {
-        if (file1[posizioneCarattereFinale - maxLCS + (i + 1)] != ' ')
-            cout << file1[posizioneCarattereFinale - maxLCS + (i + 1)]; // stampo non al contrario la stringa
+        bufferReversedString[currentLength++] = file1[posizioneCarattereFinale - (i)]; // stampo non al contrario la stringa
         i++;
         LCSXcoordinate--;
         LCSYCoordinate--;
     }
-    cout << endl;
+
+    bufferReversedString[currentLength++]= file1[posizioneCarattereFinale - (i)]; //aggiungo ultimo carattere a mano perchè esce prima dal ciclo
+    bufferReversedString[currentLength] = '\0';
+
+    for (int i = currentLength - 1; i >= 0; --i) { //chiesto a chatgpt come stamparla al contrario (in ordine giusto)
+        cout << bufferReversedString[i];
+    }
+    cout<<endl;
 }
 
 void checkDifferences()
