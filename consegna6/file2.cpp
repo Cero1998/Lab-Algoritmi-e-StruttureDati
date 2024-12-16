@@ -1,3 +1,10 @@
-int mario(int argument, char **argv){
-        cout<<"Ciao come va";
+int main(){
+    cout<<"Paperino";
+    cout<<"Pluto";
+    for(int i = 0; i<10;i++){
+        if(i ==1){
+            cout<<"Errore";
+            cout<<"Aggiungimi";
+        }
+    }
 }

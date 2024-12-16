@@ -472,7 +472,7 @@ void longestCommonSubstring()
     char bufferReversedString[maxSize] = ""; // Inizializziamo il buffer con una stringa vuota
     int currentLength = 0; // Lunghezza attuale della stringa
 
-    int i = 0;
+    int i = 1; //parto da 1 perchè la matrice ha una riga extra
     int posizioneCarattereFinale = LCSXcoordinate;
     while (matrixLCS[LCSXcoordinate][LCSYCoordinate] != 0) // risalgo la diagonale finche' non arrivo a 0
     {
@@ -482,7 +482,7 @@ void longestCommonSubstring()
         LCSYCoordinate--;
     }
 
-    bufferReversedString[currentLength++]= file1[posizioneCarattereFinale - (i)]; //aggiungo ultimo carattere a mano perchè esce prima dal ciclo
+    //bufferReversedString[currentLength++]= file1[posizioneCarattereFinale - (i)]; //aggiungo ultimo carattere a mano perchè esce prima dal ciclo
     bufferReversedString[currentLength] = '\0';
 
     for (int i = currentLength - 1; i >= 0; --i) { //chiesto a chatgpt come stamparla al contrario (in ordine giusto)
@@ -493,21 +493,134 @@ void longestCommonSubstring()
 
 void checkDifferences()
 {   
-    //chiesto a chatgpt come fare la split di un puntatore a char
+   
     char* saveptr1;
     char* saveptr2;
-    char* file1Splitted = strtok_r(file1, "\n", &saveptr1);
+    char* file1Splitted = strtok_r(file1, "\n", &saveptr1); //chiesto a chatgpt come fare la split di un puntatore a char
     char* file2Splitted = strtok_r(file2, "\n", &saveptr2);
+    int counterOpenBracketFile1 = 0; //contatore parentesi {
+    int counterOpenBracketFile2 = 0;
+    int rowFile1=1; //contatore righe
+    int rowFile2=1;
+    bool closedBracketFile1 = false;
+    bool closedBracketFile2 = false;
+    
+    if(strchr(file1Splitted, '{') != nullptr)
+        counterOpenBracketFile1++;
+    if(strchr(file2Splitted, '{') != nullptr)
+        counterOpenBracketFile2++;
 
-    while(file1Splitted != nullptr && file2Splitted != nullptr)
+    while(file1Splitted != nullptr || file2Splitted != nullptr)
     {
-        if(strcmp(file1Splitted,file2Splitted))
-        {
-            cout<<"CODICE CAMBIATO! File1-> "<<file1Splitted<<" Vs "<<file2Splitted<<" <-File2"<<endl;
-        }
 
-        file1Splitted = strtok_r(nullptr, "\n", &saveptr1);
-        file2Splitted = strtok_r(nullptr, "\n", &saveptr2);
+        if(counterOpenBracketFile1 > counterOpenBracketFile2 && closedBracketFile2 == false) //Se ho aperto una funzione nel file1, vado avanti con le aggiunte in file2
+        {
+            cout<<"CODICE AGGIUNTO! rigaFile2: "<<rowFile2<< " File2-> "<<file2Splitted<<endl;
+            file2Splitted = strtok_r(nullptr, "\n", &saveptr2);
+            rowFile2++;
+            if(file2Splitted != nullptr && strchr(file2Splitted, '{') != nullptr)
+                counterOpenBracketFile2++;
+            if(file2Splitted != nullptr && strchr(file2Splitted, '}') != nullptr)
+                counterOpenBracketFile2--;
+        }
+        else if(counterOpenBracketFile1 > counterOpenBracketFile2 && closedBracketFile2 == true)//Se ho aperto una funzione nel file2, vado avanti con le righe cancellate in file1
+        {                                                                                       //SE ho chiuso una } nel file 2 ho eliminato righe nel file1
+            closedBracketFile2 = false;
+            cout<<"CODICE ELIMINATO! rigaFile1: "<<rowFile1<<" File1-> "<<file1Splitted<<endl;
+            file1Splitted = strtok_r(nullptr, "\n", &saveptr1);
+            rowFile1++;
+            if(file1Splitted != nullptr && strchr(file1Splitted, '{') != nullptr)
+                counterOpenBracketFile1++;
+            if(file1Splitted != nullptr && strchr(file1Splitted, '}') != nullptr)
+                counterOpenBracketFile1--;
+        }
+        else if(counterOpenBracketFile1 < counterOpenBracketFile2 && closedBracketFile1 == false)//Se ho aperto una funzione nel file2, vado avanti con le righe cancellate in file1
+        {
+            cout<<"CODICE ELIMINATO! rigaFile1: "<<rowFile1<<" File1-> "<<file1Splitted<<endl;
+            file1Splitted = strtok_r(nullptr, "\n", &saveptr1);
+            rowFile1++;
+            if(file1Splitted != nullptr && strchr(file1Splitted, '{') != nullptr)
+                counterOpenBracketFile1++;
+            if(file1Splitted != nullptr && strchr(file1Splitted, '}') != nullptr)
+                counterOpenBracketFile1--;
+        }
+        else if(counterOpenBracketFile1 < counterOpenBracketFile2 && closedBracketFile1 == true) //Se ho aperto una funzione nel file1, vado avanti con le aggiunte in file2
+        {                                                                                        //SE ho chiuso una } nel file 1 ho aggiunto righe nel file2
+            closedBracketFile1 = false;
+            cout<<"CODICE AGGIUNTO! rigaFile2: "<<rowFile2<< " File2-> "<<file2Splitted<<endl;
+            file2Splitted = strtok_r(nullptr, "\n", &saveptr2);
+            rowFile2++;
+            if(file2Splitted != nullptr && strchr(file2Splitted, '{') != nullptr)
+                counterOpenBracketFile2++;
+            if(file2Splitted != nullptr && strchr(file2Splitted, '}') != nullptr)
+                counterOpenBracketFile2--;
+        }
+        else if(file1Splitted == nullptr) //file1 è terminato prima quindi sono tutte righe nuove in file2
+        {
+            cout<<"CODICE AGGIUNTO! rigaFile2: "<<rowFile2<< " File2-> "<<file2Splitted<<endl;
+            file2Splitted = strtok_r(nullptr, "\n", &saveptr2);
+            rowFile2++;
+            if(file2Splitted != nullptr && strchr(file2Splitted, '{') != nullptr)
+                counterOpenBracketFile2++;
+            if(file2Splitted != nullptr && strchr(file2Splitted, '}') != nullptr)
+                counterOpenBracketFile2--;           
+        }
+        else if(file2Splitted == nullptr) //file2 è terminato prima quindi sono tutte righe cancellate in file1
+        {
+            cout<<"CODICE ELIMINATO! rigaFile1: "<<rowFile1<<" File1-> "<<file1Splitted<<endl;
+            file1Splitted = strtok_r(nullptr, "\n", &saveptr1);
+            rowFile1++;
+            if(file1Splitted != nullptr && strchr(file1Splitted, '{') != nullptr)
+                counterOpenBracketFile1++;
+            if(file1Splitted != nullptr && strchr(file1Splitted, '}') != nullptr)
+                counterOpenBracketFile1--;
+        }
+        else if(strcmp(file1Splitted,file2Splitted) && 
+            (counterOpenBracketFile1 != 0 && counterOpenBracketFile2 != 0)) //se il codice è cambiato (aggiunto controllo per vedere se sono 
+        {                                                                   //all'ultima } perchè l'output su windows e' sporco)
+            cout<<"CODICE CAMBIATO! rigaFile1: "<<rowFile1<<" File1-> "<<file1Splitted<<" Vs "<<file2Splitted<<" <-File2 RigaFile2: "<<rowFile2<<endl;
+            file1Splitted = strtok_r(nullptr, "\n", &saveptr1);
+            file2Splitted = strtok_r(nullptr, "\n", &saveptr2);
+            rowFile1++;
+            rowFile2++;
+            if(file1Splitted != nullptr && strchr(file1Splitted, '{') != nullptr)
+                counterOpenBracketFile1++;
+            if(file2Splitted != nullptr && strchr(file2Splitted, '{') != nullptr)
+                counterOpenBracketFile2++;
+            if(file1Splitted != nullptr && strchr(file1Splitted, '}') != nullptr)
+            {
+                closedBracketFile1 = true;
+                counterOpenBracketFile1--;
+            }
+
+            if(file2Splitted != nullptr && strchr(file2Splitted, '}') != nullptr)
+            {
+                closedBracketFile2 = true;
+                counterOpenBracketFile2--;
+            }
+
+        }
+        else //righe uguali
+        {
+            file1Splitted = strtok_r(nullptr, "\n", &saveptr1);
+            file2Splitted = strtok_r(nullptr, "\n", &saveptr2);
+            rowFile1++;
+            rowFile2++;
+            if(file1Splitted != nullptr && strchr(file1Splitted, '{') != nullptr)
+                counterOpenBracketFile1++;
+            if(file2Splitted != nullptr && strchr(file2Splitted, '{') != nullptr)
+                counterOpenBracketFile2++;
+            if(file1Splitted != nullptr && strchr(file1Splitted, '}') != nullptr)
+            {
+                closedBracketFile1 = true;
+                counterOpenBracketFile1--;
+            }
+            if(file2Splitted != nullptr && strchr(file2Splitted, '}') != nullptr)
+            {
+                closedBracketFile2 = true;
+                counterOpenBracketFile2--;
+            }
+        }
     }
 }
 
@@ -550,3 +663,30 @@ int main(int argc, char **argv)
 
     return 0;
 }
+/*
+TEST FATTI CON I SEGUENTI FILE:
+
+file1:
+int main(){
+    cout<<"Topolino";
+    for(int i = 0; i<10;i++){
+        if(i ==1){
+            cout<<"Pippo";
+        }
+        cout<<"Eliminami";
+    }
+}
+
+
+file2:
+int main(){
+    cout<<"Paperino";
+    cout<<"Pluto";
+    for(int i = 0; i<10;i++){
+        if(i ==1){
+            cout<<"Errore";
+            cout<<"Aggiungimi";
+        }
+    }
+}
+*/
