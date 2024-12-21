@@ -1,0 +1,2 @@
+Con timsort:
+N test: 100, Min: 18217, Med: 18415.0, Max: 18628
