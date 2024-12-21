@@ -1,3 +1,4 @@
+// Codice scritto/alterato da Cerinelli Matteo(matricola 294907) per l'esame di Laboratorio Algoritmi e Strutture Dati
 #include <fstream>
 #include <iostream>
 #include <math.h>
